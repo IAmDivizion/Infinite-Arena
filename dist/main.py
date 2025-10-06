@@ -9,7 +9,7 @@ player = {
     "hp": 100,                   # current hp
     "dmg": [10, 20],             # the range of possible damage
     "heal": 20,                  # how much health the player gains from healing
-    "defence": 1.0,              # damage taken is multiplied by this
+    "defence": 0.5,              # damage taken is multiplied by this
     "max_hp": 100,               # highest possible hp the player can get
     "heal_cooldown": 0           # how many turns until the player can use heal again
 }
@@ -70,6 +70,7 @@ Choose your upgrade:
 1. Damage {player["dmg"]} -> {[x + 10 for x in player["dmg"]]}
 2. Healing {player["heal"]} -> {player["heal"] + 10}
 3. HP {player["max_hp"]} -> {player["max_hp"] + 20}
+4. Defence {player["defence"]} -> {player["defence"] + 5}
     ''')
 
     while True:
@@ -85,11 +86,15 @@ Choose your upgrade:
             player["heal"] = player["heal"] + 10
             print("Healing upgraded!")
             break
-        else:
+        elif upgrade_choice == "3":
             player["max_hp"] = player["max_hp"] + 20
             player["hp"] = player["max_hp"]
             print("Maximum HP upgraded!")
             break
+        elif upgrade_choice == "4":
+            player["defence"] = player["defence"] + 5
+            print("Defence upgraded!")
+
 
 
 print("Welcome to the infinite arena!")
@@ -105,8 +110,6 @@ while player["hp"] > 0:
     print(f"You are fighting: {opponent['name']} (HP: {opponent['hp']})")
 
     while player["hp"] > 0 and opponent["hp"] > 0:
-
-        player["defence"] = 1      # resets the defence option after the turn ends
 
         status(round_num, player["hp"], opponent["hp"], opponent["name"], player["dmg"], opponent["dmg"])
         choice = choices(player["heal_cooldown"])
@@ -135,16 +138,14 @@ while player["hp"] > 0:
 
 
         elif choice == "3":                                                 #  decreases damage taken by 50% for 1 turn
-            player["defence"] = 0.5
-
             clear_screen()
-            print("You defended, reducing incoming damage by 50% this turn.")
+            print("You defended...")
 
         elif choice == "4":                                                 #  informs the player on what each option does
-            print('''
-1. Attack - Does damage to the enemy. Damage dealt is a random number between 10-20.
-2. Heal - Heals you by 25 HP.
-3. Defend - Reduces incoming damage by 50%.
+            print(f'''
+1. Attack - Does damage to the enemy. Damage dealt is a random number between {player["dmg"]}.
+2. Heal - Heals you by {player["heal"]} HP.
+3. Defend - {player["defence"] * 100:.0f}% chance to block your opponents attack.
 4. Info - Displays this menu
             ''')
             continue
@@ -153,12 +154,16 @@ while player["hp"] > 0:
             sys.exit(0)
 
         if opponent["hp"] > 0:                                                                     #  opponent's turn
-            dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]) * player["defence"])
-            player["hp"] -= dmg
-            if player["defence"] != 1:
-                print(f"{opponent['name']} dealt {dmg} to You! (Defend used)")
+            if choice == "3" and random.random() <= player["defence"]:
+                print(f"Defend success! You defended {opponent['name']}'s attack!")
+            elif choice == "3" and random.random() > player["defence"]:
+                dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]))
+                player["hp"] -= dmg
+                print(f"Defend failure! {opponent['name']} dealt {dmg} to you!")
             else:
-                print(f"{opponent['name']} dealt {dmg} to You!")
+                dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]))
+                player["hp"] -= dmg
+                print(f"{opponent['name']} dealt {dmg} to you!")
         else:
             break
 
