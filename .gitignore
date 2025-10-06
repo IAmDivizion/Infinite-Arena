@@ -1,0 +1,7 @@
+# PyInstaller compilation output
+build/
+dist/
+*.spec
+
+# PyCharm/JetBrains IDE files
+.idea/
