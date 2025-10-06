@@ -9,7 +9,7 @@ player = {
     "hp": 100,                   # current hp
     "dmg": [10, 20],             # the range of possible damage
     "heal": 20,                  # how much health the player gains from healing
-    "defence": 0.5,              # damage taken is multiplied by this
+    "defense": 0.5,              # damage taken is multiplied by this
     "max_hp": 100,               # highest possible hp the player can get
     "heal_cooldown": 0           # how many turns until the player can use heal again
 }
@@ -70,7 +70,7 @@ Choose your upgrade:
 1. Damage {player["dmg"]} -> {[x + 10 for x in player["dmg"]]}
 2. Healing {player["heal"]} -> {player["heal"] + 10}
 3. HP {player["max_hp"]} -> {player["max_hp"] + 20}
-4. Defence {player["defence"]} -> {player["defence"] + 5}
+4. defense {player["defense"]} -> {player["defense"] + 5}
     ''')
 
     while True:
@@ -92,8 +92,8 @@ Choose your upgrade:
             print("Maximum HP upgraded!")
             break
         elif upgrade_choice == "4":
-            player["defence"] = player["defence"] + 5
-            print("Defence upgraded!")
+            player["defense"] = player["defense"] + 5
+            print("defense upgraded!")
 
 
 
@@ -145,7 +145,7 @@ while player["hp"] > 0:
             print(f'''
 1. Attack - Does damage to the enemy. Damage dealt is a random number between {player["dmg"]}.
 2. Heal - Heals you by {player["heal"]} HP.
-3. Defend - {player["defence"] * 100:.0f}% chance to block your opponents attack.
+3. Defend - {player["defense"] * 100:.0f}% chance to block your opponents attack.
 4. Info - Displays this menu
             ''')
             continue
@@ -154,9 +154,9 @@ while player["hp"] > 0:
             sys.exit(0)
 
         if opponent["hp"] > 0:                                                                     #  opponent's turn
-            if choice == "3" and random.random() <= player["defence"]:
+            if choice == "3" and random.random() <= player["defense"]:
                 print(f"Defend success! You defended {opponent['name']}'s attack!")
-            elif choice == "3" and random.random() > player["defence"]:
+            elif choice == "3" and random.random() > player["defense"]:
                 dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]))
                 player["hp"] -= dmg
                 print(f"Defend failure! {opponent['name']} dealt {dmg} to you!")
