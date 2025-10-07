@@ -70,7 +70,7 @@ Choose your upgrade:
 1. Damage {player["dmg"]} -> {[x + 10 for x in player["dmg"]]}
 2. Healing {player["heal"]} -> {player["heal"] + 10}
 3. HP {player["max_hp"]} -> {player["max_hp"] + 20}
-4. defense {player["defense"]} -> {player["defense"] + 5}
+4. Defense {player["defense"]*100:.0f}% -> {(player["defense"]*100)+5:.0f}%
     ''')
 
     while True:
@@ -92,7 +92,7 @@ Choose your upgrade:
             print("Maximum HP upgraded!")
             break
         elif upgrade_choice == "4":
-            player["defense"] = player["defense"] + 5
+            player["defense"] = player["defense"] + 0.05
             print("defense upgraded!")
 
 
