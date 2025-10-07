@@ -9,7 +9,7 @@ player = {
     "hp": 100,                   # current hp
     "dmg": [10, 20],             # the range of possible damage
     "heal": 20,                  # how much health the player gains from healing
-    "defense": 0.5,              # damage taken is multiplied by this
+    "defense": 0.4,              # damage taken is multiplied by this
     "max_hp": 100,               # highest possible hp the player can get
     "heal_cooldown": 0           # how many turns until the player can use heal again
 }
@@ -23,8 +23,8 @@ def create_enemy(round_number):
 
 
 def create_boss(round_number):
-    hp = 100 + (round_number * 10)
-    dmg_increase = round_number // 2  # or round_number // 3 if too fast
+    hp = round_number * 10
+    dmg_increase = round_number // 3  # or round_number // 3 if too fast
     damage = [15 + dmg_increase, 30 + dmg_increase]
     return {"name": f"Boss {round_number // 10}", "hp": hp, "dmg": damage}
 
@@ -70,12 +70,12 @@ Choose your upgrade:
 1. Damage {player["dmg"]} -> {[x + 10 for x in player["dmg"]]}
 2. Healing {player["heal"]} -> {player["heal"] + 10}
 3. HP {player["max_hp"]} -> {player["max_hp"] + 20}
-4. defense {player["defense"]} -> {player["defense"] + 5}
+4. defense {player["defense"] * 100:.0f} -> {player["defense"] * 100 + 5:.0f}
     ''')
 
     while True:
         upgrade_choice = input("> ")
-        if upgrade_choice not in ("1", "2", "3"):
+        if upgrade_choice not in ("1", "2", "3", "4"):
             print("You must choose one of the options.")
             continue
         elif upgrade_choice == "1":
@@ -94,6 +94,7 @@ Choose your upgrade:
         elif upgrade_choice == "4":
             player["defense"] = player["defense"] + 5
             print("defense upgraded!")
+            break
 
 
 
@@ -154,12 +155,15 @@ while player["hp"] > 0:
             sys.exit(0)
 
         if opponent["hp"] > 0:                                                                     #  opponent's turn
-            if choice == "3" and random.random() <= player["defense"]:
-                print(f"Defend success! You defended {opponent['name']}'s attack!")
-            elif choice == "3" and random.random() > player["defense"]:
-                dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]))
-                player["hp"] -= dmg
-                print(f"Defend failure! {opponent['name']} dealt {dmg} to you!")
+            if choice == "3":
+                if random.random() > player["defense"]:
+                    dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]))
+                    player["hp"] -= dmg
+                    print(f"Defend failed! {opponent['name']} dealt {dmg} to you!")
+
+                else:
+                    print(f"Defend success! You blocked {opponent['name']}'s attack!")
+
             else:
                 dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]))
                 player["hp"] -= dmg
