@@ -75,7 +75,7 @@ Choose your upgrade:
 
     while True:
         upgrade_choice = input("> ")
-        if upgrade_choice not in ("1", "2", "3"):
+        if upgrade_choice not in ("1", "2", "3", "4"):
             print("You must choose one of the options.")
             continue
         elif upgrade_choice == "1":
@@ -92,8 +92,12 @@ Choose your upgrade:
             print("Maximum HP upgraded!")
             break
         elif upgrade_choice == "4":
-            player["defense"] = player["defense"] + 0.05
-            print("defense upgraded!")
+            if player["defense"] == 0.65:
+                print("Maximum defense reached!")
+                continue
+            else:
+                player["defense"] = player["defense"] + 0.05
+                print("defense upgraded!")
 
 
 
