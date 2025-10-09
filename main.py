@@ -9,9 +9,10 @@ player = {
     "hp": 100,                   # current hp
     "dmg": [10, 20],             # the range of possible damage
     "heal": 20,                  # how much health the player gains from healing
-    "defense": 0.5,              # damage taken is multiplied by this
+    "defense": 0.4,              # damage taken is multiplied by this
     "max_hp": 100,               # highest possible hp the player can get
-    "heal_cooldown": 0           # how many turns until the player can use heal again
+    "heal_cooldown": 0,          # how many turns until the player can use heal again
+    "defending": False           # Check if player is defending
 }
 
 
@@ -19,14 +20,20 @@ def create_enemy(round_number):
     hp = 30 + (round_number * 5)
     dmg_increase = round_number // 3
     damage = [10 + dmg_increase, 20 + dmg_increase]
-    return {"name": f"Enemy {round_number}", "hp": hp, "dmg": damage}
+    heal = 10 + round_number
+    defense = 0.5
+    defending = False
+    return {"name": f"Enemy {round_number}", "hp": hp, "dmg": damage, "heal": heal, "defense": defense, "defending": defending}
 
 
 def create_boss(round_number):
-    hp = 100 + (round_number * 10)
-    dmg_increase = round_number // 2  # or round_number // 3 if too fast
+    hp = 100 + (round_number * 5)
+    dmg_increase = round_number // 3  # or round_number // 3 if too fast
     damage = [15 + dmg_increase, 30 + dmg_increase]
-    return {"name": f"Boss {round_number // 10}", "hp": hp, "dmg": damage}
+    heal = 20 + round_number
+    defense = 0.5
+    defending = False
+    return {"name": f"Boss {round_number // 10}", "hp": hp, "dmg": damage, "heal": heal, "defense": defense, "defending": defending}
 
 
 def status(round_number, player_hp, opponent_hp, opponent_name, player_dmg, opponent_dmg):   # prints the current status of the game
@@ -123,10 +130,22 @@ while player["hp"] > 0:
             continue
 
         if choice == "1":                                                   #  deals damage to the enemy
-            dmg = randint(player["dmg"][0], player["dmg"][1])
-            opponent["hp"] -= dmg
-            clear_screen()
-            print(f"You dealt {dmg} damage to {opponent['name']}!")
+            if opponent["defending"] and random.random() <= opponent["defense"]:
+                opponent["defending"] = False
+                clear_screen()
+                print(f"{opponent['name']} defended you attack!")
+
+            elif opponent["defending"] and random.random() > opponent["defense"]:
+                opponent["defending"] = False
+                dmg = randint(player["dmg"][0], player["dmg"][1])
+                opponent["hp"] -= dmg
+                clear_screen()
+                print(f"{opponent['name']}'s defense failed! You dealt {dmg} damage to {opponent['name']}!")
+            else:
+                dmg = randint(player["dmg"][0], player["dmg"][1])
+                opponent["hp"] -= dmg
+                clear_screen()
+                print(f"You dealt {dmg} damage to {opponent['name']}!")
 
         elif choice == "2":                                                 #  heals the player
             if player["heal_cooldown"] == 0:
@@ -142,6 +161,7 @@ while player["hp"] > 0:
 
 
         elif choice == "3":                                                 #  decreases damage taken by 50% for 1 turn
+            player["defending"] = True
             clear_screen()
             print("You defended...")
 
@@ -158,16 +178,27 @@ while player["hp"] > 0:
             sys.exit(0)
 
         if opponent["hp"] > 0:                                                                     #  opponent's turn
-            if choice == "3" and random.random() <= player["defense"]:
-                print(f"Defend success! You defended {opponent['name']}'s attack!")
-            elif choice == "3" and random.random() > player["defense"]:
-                dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]))
-                player["hp"] -= dmg
-                print(f"Defend failure! {opponent['name']} dealt {dmg} to you!")
-            else:
-                dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]))
-                player["hp"] -= dmg
-                print(f"{opponent['name']} dealt {dmg} to you!")
+            opponent_choice = randint(1,4)
+            if opponent_choice in (1, 2):
+                if player["defending"] and random.random() <= player["defense"]:
+                    print(f"Defend success! You defended {opponent['name']}'s attack!")
+                elif player["defending"] and random.random() > player["defense"]:
+                    dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]))
+                    player["hp"] -= dmg
+                    print(f"Defend failure! {opponent['name']} dealt {dmg} to you!")
+                else:
+                    dmg = round(randint(opponent["dmg"][0], opponent["dmg"][1]))
+                    player["hp"] -= dmg
+                    print(f"{opponent['name']} dealt {dmg} to you!")
+
+            elif opponent_choice == 2:
+                opponent["hp"] += opponent["heal"]
+                print(f"opponent healed for {opponent['heal']} HP")
+
+            elif opponent_choice == 3:
+                opponent["defending"] = True
+                print("Opponent defending...")
+
         else:
             break
 
